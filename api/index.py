@@ -51,8 +51,8 @@ def get_metrics_for_region(region_df: pd.DataFrame, threshold: int) -> dict:
         "breaches": int(breaches),
     }
 
-# --- POST endpoint for metrics ---
-@app.post("/metrics")  # Changed from "/" to "/metrics"
+# --- POST endpoint for metrics (back at root) ---
+@app.post("/")
 async def get_region_metrics(request: MetricsRequest):
     if df_full is None:
         raise HTTPException(status_code=500, detail="Data loading failed. Check telemetry.json path.")
@@ -67,7 +67,7 @@ async def get_region_metrics(request: MetricsRequest):
     
     return results
 
-# --- Root / health check endpoint ---
+# --- Root / health check endpoint (GET) ---
 @app.get("/")
 async def read_root():
     return {"status": "ok", "message": "Latency checker service is running."}

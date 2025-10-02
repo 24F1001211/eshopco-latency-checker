@@ -1,4 +1,4 @@
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 import pandas as pd
@@ -21,16 +21,16 @@ except json.JSONDecodeError:
     print(f"ERROR: Failed to parse telemetry.json")
     df_full = None
 
-# --- FastAPI app and CORS ---
+# --- FastAPI app ---
 app = FastAPI(title="eShopCo Latency Checker")
 
-# Enable CORS for any origin
+# --- Enable CORS for any origin ---
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],      # allow requests from any origin
-    allow_credentials=False,   # must be False when using "*"
-    allow_methods=["POST"],    # allow POST requests
-    allow_headers=["*"],       # allow all headers
+    allow_origins=["*"],       # allow all origins
+    allow_credentials=False,    # must be False with "*"
+    allow_methods=["*"],        # allow all HTTP methods including OPTIONS
+    allow_headers=["*"],        # allow all headers
 )
 
 # --- Pydantic request model ---
@@ -51,9 +51,9 @@ def get_metrics_for_region(region_df: pd.DataFrame, threshold: int) -> dict:
         "breaches": int(breaches),
     }
 
-# --- POST endpoint ---
+# --- POST endpoint for metrics ---
 @app.post("/")
-def get_region_metrics(request: MetricsRequest):
+async def get_region_metrics(request: MetricsRequest):
     if df_full is None:
         raise HTTPException(status_code=500, detail="Data loading failed. Check telemetry.json path.")
 
@@ -67,7 +67,12 @@ def get_region_metrics(request: MetricsRequest):
 
     return results
 
-# --- Optional health check ---
+# --- OPTIONS handler for preflight (optional but ensures dashboards work) ---
+@app.options("/{rest_of_path:path}")
+async def options_handler(rest_of_path: str, request: Request):
+    return {}
+
+# --- Root / health check endpoint ---
 @app.get("/")
-def read_root():
+async def read_root():
     return {"status": "ok", "message": "Latency checker service is running."}

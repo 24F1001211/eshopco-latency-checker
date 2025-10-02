@@ -36,13 +36,16 @@ except json.JSONDecodeError:
 app = FastAPI(title="eShopCo Latency Checker")
 
 # Corrected CORS Configuration
+from fastapi.middleware.cors import CORSMiddleware
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],   # allows all origins
-    allow_credentials=True,
-    allow_methods=["POST", "OPTIONS"],
-    allow_headers=["*"],
+    allow_origins=["*"],       # allows all domains
+    allow_credentials=False,   # must be False if using "*"
+    allow_methods=["*"],       # allow all methods
+    allow_headers=["*"],       # allow all headers
 )
+
 
 
 # --- Pydantic Request Model ---

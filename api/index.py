@@ -43,11 +43,11 @@ def get_metrics_for_region(region_df: pd.DataFrame, threshold: int) -> dict:
     avg_latency = region_df["latency_ms"].mean()
     p95_latency = region_df["latency_ms"].quantile(0.95)
     breaches = (region_df["latency_ms"] > threshold).sum()
-    avg_uptime = region_df["uptime_pct"].mean() / 100.0
+    avg_uptime = region_df["uptime_pct"].mean()
     return {
         "avg_latency": round(avg_latency, 2),
         "p95_latency": round(p95_latency, 2),
-        "avg_uptime": round(avg_uptime, 4),
+        "avg_uptime": round(avg_uptime, 3),
         "breaches": int(breaches),
     }
 

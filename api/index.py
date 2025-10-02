@@ -40,16 +40,11 @@ from fastapi.middleware.cors import CORSMiddleware
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[
-        "https://your-frontend.vercel.app",
-        "http://localhost:3000"
-    ],
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
+    allow_origins=["*"],      # allow all domains
+    allow_credentials=False,  # must be False with "*"
+    allow_methods=["*"],      # allow all HTTP methods
+    allow_headers=["*"],      # allow all headers
 )
-
-
 
 
 # --- Pydantic Request Model ---

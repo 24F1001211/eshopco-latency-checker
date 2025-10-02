@@ -7,7 +7,6 @@ import json
 
 # --- Load telemetry data ---
 data_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), "telemetry.json")
-
 try:
     with open(data_path, "r") as f:
         data_list = json.load(f)
@@ -27,10 +26,11 @@ app = FastAPI(title="eShopCo Latency Checker")
 # --- Enable CORS for any origin ---
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],       # allow all origins
-    allow_credentials=False,    # must be False with "*"
-    allow_methods=["*"],        # allow all HTTP methods including OPTIONS
-    allow_headers=["*"],        # allow all headers
+    allow_origins=["*"],
+    allow_credentials=False,
+    allow_methods=["*"],
+    allow_headers=["*"],
+    expose_headers=["*"]  # Added this line
 )
 
 # --- Pydantic request model ---
@@ -52,11 +52,11 @@ def get_metrics_for_region(region_df: pd.DataFrame, threshold: int) -> dict:
     }
 
 # --- POST endpoint for metrics ---
-@app.post("/")
+@app.post("/metrics")  # Changed from "/" to "/metrics"
 async def get_region_metrics(request: MetricsRequest):
     if df_full is None:
         raise HTTPException(status_code=500, detail="Data loading failed. Check telemetry.json path.")
-
+    
     results = {}
     for region in request.regions:
         region_df = df_full[df_full["region"] == region.lower()]
@@ -64,13 +64,8 @@ async def get_region_metrics(request: MetricsRequest):
             results[region] = {"error": f"No data found for region '{region}'"}
             continue
         results[region] = get_metrics_for_region(region_df, request.threshold_ms)
-
+    
     return results
-
-# --- OPTIONS handler for preflight (optional but ensures dashboards work) ---
-@app.options("/{rest_of_path:path}")
-async def options_handler(rest_of_path: str, request: Request):
-    return {}
 
 # --- Root / health check endpoint ---
 @app.get("/")

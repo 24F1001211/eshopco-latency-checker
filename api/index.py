@@ -38,12 +38,12 @@ app = FastAPI(title="eShopCo Latency Checker")
 # Corrected CORS Configuration
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # Allows all origins, as required
+    allow_origins=["*"],   # allows all origins
     allow_credentials=True,
-    # FIX: Removed the extra comma here
-    allow_methods=["POST", "OPTIONS"], 
+    allow_methods=["POST", "OPTIONS"],
     allow_headers=["*"],
 )
+
 
 # --- Pydantic Request Model ---
 class MetricsRequest(BaseModel):

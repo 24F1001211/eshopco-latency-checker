@@ -65,7 +65,7 @@ async def get_region_metrics(request: MetricsRequest):
             continue
         results[region] = get_metrics_for_region(region_df, request.threshold_ms)
     
-    return results
+    return {"regions": results}  # Wrap in "regions" key
 
 # --- Root / health check endpoint (GET) ---
 @app.get("/")
